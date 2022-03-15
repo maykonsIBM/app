@@ -5,18 +5,6 @@
       set -x
     fi
     CURRENT_DIRECTORY=$(pwd)
-
-    if [[ "$(get_env pipeline_namespace)" == *"ci"* ]]; then
-      export APP_URL=$(get_env app-url)
-    elif [[ -z $(get_env app-url "") ]]; then
-      echo "Please provide app-url as environment property. You can provide it through the pipeline UI as a parameter or set it during the pipeline run by running 'set_env app-url \$URL'"
-      exit 1
-    else
-      export APP_URL=$(get_env app-url)
-    fi
-        
-    echo "APP_URL is ${APP_URL}"
-
     
     # GENERAL NOTE
     # The zap scan scripts assume it is working from ${WORKSPACE} (/workspace/app)
@@ -72,29 +60,30 @@
     # set the url of the app to scan
     # reading back the param that was exported in the dynamic-scan setup stage
     export URL
-    URL="$(get_env app-url "${APP_URL}")"
+    URL=$(get_env app-url "")
 
     if [ -z  "${URL}"  ] || [[  "${URL}" = "http://null"  ]]; then
-      
-      # ZAP_SCRIPTS_DIR="${WORKSPACE}/$(get_env zap-core-scripts "")"
       ZAP_EVIDENCE_TYPE="$(get_env zap_evidence_type "com.ibm.dynamic_scan")"
       ZAP_STATUS_TYPE="failure"
       source "${COMMONS_PATH}"/owasp-zap/report.sh
 
       echo "Unable to get Application URL....."
+      echo "Please provide app-url as environment property. You can provide it through the pipeline UI as a parameter or set it during the pipeline run by running 'set_env app-url \$URL'"
       exit 1
-    fi 
+    fi
 
     set_env "target-application-server-url" "${URL}"
 
+    APP_REPO_PATH="$(load_repo app-repo path)"
+
     # set the swagger defintion file(s) comma separated if required
-    set_env "swagger-definition-files" "one-pipeline-config-repo/definitions/definitions1.json"
+    set_env "swagger-definition-files" "$APP_REPO_PATH/definitions/definitions1.json"
 
     # set an optional custom file to modify the swagger definition before it is sent to be scan
-    set_env "zap-api-custom-script" "one-pipeline-config-repo/scripts/zap/zap-custom-scripts/custom-api-script"
+    set_env "zap-api-custom-script" "$APP_REPO_PATH/scripts/zap/zap-custom-scripts/custom-api-script"
 
     # set zap-ui-scripts directory
-    set_env "zap-ui-script-directory" "one-pipeline-config-repo/scripts/zap/uiscripts"
+    set_env "zap-ui-script-directory" "$APP_REPO_PATH/scripts/zap/uiscripts"
 
     if [ -n "$(get_env opt-in-dynamic-api-scan "")" ]; then
       # start the api scan

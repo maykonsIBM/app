@@ -112,9 +112,6 @@ dynamic-scan:
     if [ -z "$(get_env opt-in-dynamic-scan "")" ]; then
       echo "If you want to enable this stage, add 'opt-in-dynamic-scan' parameter to your pipeline with any value. Also, please add 'opt-in-dynamic-api-scan' to your pipeline with any value to have api scans running, and 'opt-in-dynamic-ui-scan' with any value to have ui scans running" >&2
     else
-      export APP_URL=$(get_env app-url)
-      echo "APP_URL is ${APP_URL}"   
-    
       source scripts/zap/trigger-async-zap
     fi
 
@@ -124,7 +121,4 @@ owasp-zap:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.12@sha256:ff4053b0bca784d6d105fee1d008cfb20db206011453071e86b69ca3fde706a4
   script: |
     #!/usr/bin/env bash
-    export APP_URL=$(get_env app-url "")
-    echo "APP_URL is ${APP_URL}"
-    
     source scripts/zap/trigger_zap_scans
