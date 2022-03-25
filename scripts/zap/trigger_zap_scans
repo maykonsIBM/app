@@ -74,7 +74,8 @@
 
     set_env "target-application-server-url" "${URL}"
 
-    APP_REPO_PATH="$(load_repo app-repo path)"
+    app_repo=$(get_env app_repo "app-repo")
+    APP_REPO_PATH=$(load_repo "${app_repo}" path)
 
     # set the swagger defintion file(s) comma separated if required
     set_env "swagger-definition-files" "$APP_REPO_PATH/definitions/definitions1.json"

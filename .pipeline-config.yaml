@@ -112,6 +112,14 @@ dynamic-scan:
     if [ -z "$(get_env opt-in-dynamic-scan "")" ]; then
       echo "If you want to enable this stage, add 'opt-in-dynamic-scan' parameter to your pipeline with any value. Also, please add 'opt-in-dynamic-api-scan' to your pipeline with any value to have api scans running, and 'opt-in-dynamic-ui-scan' with any value to have ui scans running" >&2
     else
+      if [[ "$(get_env pipeline_namespace)" == *"cc"* ]]; then
+        app_url=$(get_env app-url "")
+        if [[ -z "${app_url}" ]]; then
+          echo "Please provide the app_url as the running application url. Recomended to use stage/test enviroment to run the Dynamic scan." >&2
+          exit 1
+        fi
+        source scripts/zap/zap-cc-config
+      fi
       source scripts/zap/trigger-async-zap
     fi
 
