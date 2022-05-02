@@ -39,6 +39,9 @@ get-icr-region() {
     ibm:yp:ca-tor)
       echo ca
       ;;
+    stg)
+      echo stg
+      ;;  
     *)
       echo "Unknown region: $1" >&2
       exit 1
@@ -49,6 +52,8 @@ get-icr-region() {
 # curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 # add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 # apt-get update && apt-get install docker-ce-cli
+
+IBMCLOUD_API=$(get_env ibmcloud-api "https://cloud.ibm.com")
 
 if [[ -s "/config/repository" ]]; then
   REPOSITORY="$(cat /config/repository)"
@@ -73,7 +78,7 @@ else
   # Create the namespace if needed to ensure the push will be can be successfull
   echo "Checking registry namespace: ${ICR_REGISTRY_NAMESPACE}"
   IBM_LOGIN_REGISTRY_REGION=$(cat /config/registry-region | awk -F: '{print $3}')
-  ibmcloud login --apikey @/config/api-key -r "$IBM_LOGIN_REGISTRY_REGION"
+  ibmcloud login --apikey @/config/api-key -r "$IBM_LOGIN_REGISTRY_REGION" -a "$IBMCLOUD_API"
   NS=$( ibmcloud cr namespaces | sed 's/ *$//' | grep -x "${ICR_REGISTRY_NAMESPACE}" ||: )
 
   if [ -z "${NS}" ]; then
