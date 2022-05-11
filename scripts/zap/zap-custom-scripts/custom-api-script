@@ -33,8 +33,8 @@ app_url_regex="^${APP_URL_REGEX//\//\\\/}\$"
 
 jq --arg app_url_regex "${app_url_regex}" '{
     "excludeScanTypes": [],
-    "globalExcludeUrls": [ $app_url_regex ],
     "apisToScan": [{"path":"/health", "method":"get"}],
+    "globalExcludeUrls": [ $app_url_regex ],
     "apiDefinitionJson": .
 }' "$(pwd)/_resolved.json" > "${API_DATA_FILE}"
 

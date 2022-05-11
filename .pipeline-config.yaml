@@ -20,7 +20,6 @@ test:
     #!/usr/bin/env bash
 
     cd ../"$(load_repo app-repo path)"
-    npm install
     npm ci
     # save exit code for old evidence collection
     exit_code=0
@@ -74,7 +73,8 @@ acceptance-test:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi@sha256:d59863621d3ba1b9bd47f76950c751e842405f9c303d0d4d4298d964b664ee85
   script: |
     #!/usr/bin/env bash
-    npm install
+
+    source /root/.nvm/nvm.sh
     npm ci
     export APP_URL=$(get_env app-url)    
     # save exit code for old evidence collection
