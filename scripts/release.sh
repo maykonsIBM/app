@@ -14,6 +14,8 @@ APP_REPO_NAME=${APP_REPO_NAME%.git}
 
 COMMIT_SHA="$(load_repo app-repo commit)"
 
+APP_ABSOLUTE_SCM_TYPE=$(get_absolute_scm_type "$APP_REPO")
+
 INVENTORY_TOKEN_PATH="./inventory-token"
 read -r INVENTORY_REPO_NAME INVENTORY_REPO_OWNER INVENTORY_SCM_TYPE INVENTORY_API_URL < <(get_repo_params "$(get_env INVENTORY_URL)" "$INVENTORY_TOKEN_PATH")
 #
@@ -43,9 +45,11 @@ function upload_deployment_files_artifacts() {
 
     deployment_file=$1
     deployment_type=$2
-    if [ "$APP_SCM_TYPE" == "gitlab" ]; then
+    if [ "$APP_ABSOLUTE_SCM_TYPE" == "hostedgit" ]; then
         id=$(curl --header "PRIVATE-TOKEN: ${token}" ${APP_API_URL}/projects/${APP_REPO_ORG}%2F${APP_REPO_NAME} | jq .id)
         DEPLOYMENT_ARTIFACT="${APP_API_URL}/projects/${id}/repository/files/${deployment_file}/raw?ref=${COMMIT_SHA}"
+    elif [ "$APP_ABSOLUTE_SCM_TYPE" == "github_integrated" ]; then
+        DEPLOYMENT_ARTIFACT="https://raw.github.ibm.com/${APP_REPO_ORG}/${APP_REPO_NAME}/${COMMIT_SHA}/${deployment_file}"
     else
         DEPLOYMENT_ARTIFACT="https://raw.githubusercontent.com/${APP_REPO_ORG}/${APP_REPO_NAME}/${COMMIT_SHA}/${deployment_file}"
     fi
