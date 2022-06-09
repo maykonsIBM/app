@@ -4,6 +4,8 @@
 # prepare data for the release step. Here we upload all the metadata to the Inventory Repo.
 # If you want to add any information or artifact to the inventory repo then use the "cocoa inventory add command"
 #
+
+# shellcheck source=/dev/null
 . "${ONE_PIPELINE_PATH}/tools/get_repo_params"
 
 APP_REPO="$(load_repo app-repo url)"
